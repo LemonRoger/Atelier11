@@ -6,10 +6,16 @@ var app = express();
 
 app.set('view engine', 'ejs');
 
-
-
+var mqtt = require('mqtt');
+var client  = mqtt.connect('mqtt://192.168.2.1:1883');
 
 var moduleStates = [0,0,0,0,0,0];
+
+
+
+client.on('connect', function () {
+    console.log("MQTT connecté !");
+});
 
 
 
