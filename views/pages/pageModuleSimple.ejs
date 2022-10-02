@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<!-- views/pages/pageModules.ejs -->
+
+<html lang="fr">
+
+<head>
+
+    <%- include('../partials/head') %>
+
+</head>
+
+<body class="container">
+
+    <header>
+
+        <%- include('../partials/header') %>
+
+    </header>
+
+
+    <main>
+
+        <div class="jumbotron">
+            
+            <div>
+            <% if(id > 6){ %> 
+                <h1>Module inconnu</h1> 
+            <% } else{ %> 
+                <h1>Module <%= id %></h1>
+                <% } %> 
+            </div>
+
+
+
+
+            <p>
+                <div>
+                    <% if(state == 1){ %> 
+                        <h3>Activé</h3> 
+                    <% } else{ %> 
+                        <h3>Désactivé</h3>
+                        <% } %> 
+                </div>
+               
+            </p>
+
+        </div>
+
+    </main>
+
+    
+    <footer>
+
+        <%- include('../partials/footer') %>
+
+    </footer>
+
+</body>
+
+</html>
