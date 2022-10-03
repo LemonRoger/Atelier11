@@ -13,78 +13,65 @@ var mqtt = require('mqtt');
 var client = mqtt.connect('mqtt://127.0.0.1:1883');
 
 
-client.on('connect', function () {
+client
+.on('connect', function () {
     client.subscribe('MODULE/#');
     client.publish('MODULE', 'le serveur js vous dit bonjour');
     console.log("MQTT connecté !");
+})
+.on('message', function (topic, message) {
+    var sujet = topic.toString();
+    var msg = message.toString();
+    console.log(sujet);
+    console.log(msg);
+    if(sujet.startsWith("MODULE"))
+    { 
+        var id = sujet[sujet.length - 1]; 
+        if(((id <= '6') && (id >= '0')) && (msg == "ON"))
+        { 
+            moduleStates[Number(id)-1] = 1;
+        }
+        else if(((id <= '6') && (id >= '0')) && (msg == "OFF"))
+        {
+            moduleStates[Number(id)-1] = 0;
+        }
+
+    }
+        
+
 });
-client.on('message', function (topic, message) {
-    console.log(topic.toString());
-    console.log(message.toString());
-  });
   
 
 
-
-app.get('/', function(req,res,next){
-    res.render('pages/index').status(200);
-});
-
-//route simple
-app.get('/contact', function(req,res,next){
-    res.render('pages/pageContact').status(200);
-});
-
-app.get('/btn/:id', function(req,res,next){
-    if(moduleStates[(req.params.id) - 1] == 1)
-    {
-        moduleStates[(req.params.id) - 1] = 0;
-    }
-    else
-    {
-        moduleStates[(req.params.id) - 1] = 1;
-    }
+//////////////////////////////////////////  GESTION DU SERVEUR
+app
+.get('/', function(req,res,next){
+    res.render('pages/index');
+})
+.get('/contact', function(req,res,next){///////////////Page Cotancts
+    res.render('pages/pageContact');
+})
+.get('/btn/:id', function(req,res,next){//////////////Boutons on/off
+    moduleStates[(req.params.id) - 1] ^= 1;
     res.redirect(302,'/modules');
     next();
-});
-app.get('/Reset', function(req,res,next){
+})
+.get('/Reset', function(req,res,next){/////////////Bouton reset
     for(var i = 0 ; i < 6 ; i++)
-    {
         moduleStates[i] = 0;
-    }
     res.redirect(302,'/modules');
     next();
-});
-
-
-app.get('/modules', function(req,res,next){
-    res.render('pages/pageModules',{mod1:moduleStates[0],mod2:moduleStates[1],mod3:moduleStates[2],mod4:moduleStates[3],mod5:moduleStates[4],mod6:moduleStates[5]}).status(200);
-});
-
-//Route dynamique
-app.get('/module/:id', function(req,res,next){
-    if(req.params.id <= 6)
-    {
-
-        if(moduleStates[(req.params.id) - 1] ==1)
-        {
-            moduleStates[(req.params.id) - 1] = 0; 
-        }
-        else
-        {
-            moduleStates[(req.params.id) - 1] =1; 
-        }
-        
-        res.render('./pages/pageModuleSimple', {id: req.params.id, state:moduleStates[(req.params.id) - 1]});
-    }
+})
+.get('/modules', function(req,res,next){////////////////////////////////PAGE MODULES/CONTROLE
+    res.render('pages/pageModules',{modules:moduleStates}).status(200);
+})
+.get('/module/:id', function(req,res,next){////////////////PAGE MODULE SIMPLE
+    if((req.params.id >= 0) && (req.params.id <= 6))
+        moduleStates[(req.params.id) - 1] ^= 1;
     res.render('./pages/pageModuleSimple', {id: req.params.id, state:moduleStates[(req.params.id) - 1]});
-
-});
-
-app.use(function(req,res,next){
+})
+.use(function(req,res,next){///////////////////////////////PAGE ERREUR
     res.status(404).send('<h1>' + 'Erreur 404' + '</h1>');
-});
-
-
-app.listen(8080);
-console.log("Lab03 - Serveur lancé - 8080");
+})
+.listen(8080);
+console.log("Atelier - Serveur lancé - 8080");
